@@ -45,7 +45,7 @@ edatTimingFiles <- function(datfile, datpath, savedir,
     )
   }
 
-  dat <- loadDat(txtfile, datpath, sheetname = sheetname, skiprows = skiprows)
+  dat <- loadDat(datfile, datpath, sheetname = sheetname, skiprows = skiprows)
 
   writeTimingfiles(dat, prefix, pid, session, timingfile_format, condition_labels, savedir)
 }
