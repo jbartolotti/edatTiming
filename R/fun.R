@@ -34,7 +34,7 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 0){
   dat$CondAnt <- 'none'
   dat$CondFeedback <- 'none'
 
-  dat$CondAnt[dat$Condition == 'Triangle'] <- 'No'
+  dat$CondAnt[dat$Condition == 'Triangle'] <- 'Neutral'
   dat$CondAnt[dat$Condition == 'SmallReward'] <- 'Reward'
   dat$CondAnt[dat$Condition == 'LgReward'] <- 'Reward'
   dat$CondAnt[dat$Condition == 'SmallPun'] <- 'Loss'
@@ -44,6 +44,7 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 0){
   dat$CondFeedback[dat$CondAnt == 'Loss' & dat$prbacc == 0] <- 'LossNeg'
   dat$CondFeedback[dat$CondAnt == 'Reward' & dat$prbacc == 1] <- 'RewardPos'
   dat$CondFeedback[dat$CondAnt == 'Reward' & dat$prbacc == 0] <- 'RewardNeg'
+  dat$CondFeedback[dat$CondAnt == 'Neutral'] <- 'NeutralFdbk'
 
   trialrows <- dat$Procedure.Trial. == 'RunProc'
   dat <- dat[trialrows,]
@@ -56,22 +57,27 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 0){
 }
 
 
-writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condition_labels, savedir){
+alltimes <- writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condition_labels, savedir, figurename){
+  times <- list()
+
   antcond <- unique(dat$CondAnt)
   antcond <- antcond[!is.na(antcond)]
   antcond <- antcond[!(antcond %in% 'none')]
 
   for(cc in antcond){
+    runtimes <- list()
     condition <- condition_labels[[cc]]
     fname <- eval(parse(text = timingfile_format))
     fid <- file(file.path(savedir, fname ),'w+')
     myruns <- unique(dat$Run[dat$CondAnt == cc])
     myruns <- myruns[!is.na(myruns)]
     for(rr in myruns){
-      times <- dat$CueStart.sec[dat$CondAnt == cc & dat$Run == rr]
-      writeLines(paste(times, collapse = ' '),fid)
+      tt <- dat$CueStart.sec[dat$CondAnt == cc & dat$Run == rr]
+      writeLines(paste(tt, collapse = ' '),fid)
+      runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
 
     }
+    times[[cc]] <- do.call('rbind',runtimes)
     close(fid)
   }
 
@@ -79,16 +85,30 @@ writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condi
   fdbcond <- fdbcond[!is.na(fdbcond)]
   fdbcond <- fdbcond[!(fdbcond %in% 'none')]
   for(cc in fdbcond){
+    runtimes <- list()
     condition <- condition_labels[[cc]]
     fname <- eval(parse(text = timingfile_format))
     fid <- file(file.path(savedir, fname ),'w+')
     myruns <- unique(dat$Run[dat$CondFeedback == cc])
     myruns[!is.na(myruns)]
     for(rr in myruns){
-      times <- dat$FdbkStart.sec[dat$CondFeedback == cc & dat$Run == rr]
-      writeLines(paste(times, collapse = ' '),fid)
+      tt <- dat$FdbkStart.sec[dat$CondFeedback == cc & dat$Run == rr]
+      writeLines(paste(tt, collapse = ' '),fid)
+      runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
 
     }
+    times[[cc]] <- do.call('rbind',runtimes)
     close(fid)
   }
+  alltimes <- do.call('rbind',times)
+  if(!is.null(figurename)){
+    hlinedat <- data.frame(
+      time = rep(c(min(alltimes$time),max(alltimes$time)),by = length(unique(alltimes$cond)) * length(unique(alltimes$run))),
+      cond = rep(unique(alltimes$cond), each = 2, 2),
+      run = rep(unique(alltimes$run), each = 2*length(unique(alltimes$cond))))
+    ggplot(alltimes, aes(x = time, y = cond)) + theme_bw()  + geom_line(data = hlinedat, aes(color = cond), alpha = .1) + geom_line(aes(group = 1)) + geom_point(aes(color = cond)) + facet_wrap(. ~ run, ncol = 1) + labs(x = '', y = '')
+    ggsave(figurename, height = 3, width = 12)
+  }
+
+  return(alltimes)
 }
