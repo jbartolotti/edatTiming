@@ -18,11 +18,11 @@
 #' @param skiprows (optional) number of rows to skip when importing the edatfile. Default is '1', meaning that column names start on row 2.
 #' @param sheetname (optional) If datfile is an excel sheet instead of a text file, the name of the Sheet to import
 #' @param timingfile_format (optional) A string containing R code to evaluate to create the filenames of the timing files. Default is:
-#'      "sprintf('%s%s_%.2d_%s.txt', prefix, pid, session, condition)"
+#'      "sprintf('%s%s_%s_%s.txt', prefix, pid, session, condition)"
 #' @param prefix (optional) a parameter that can be used in 'timingfile_format'. Defaults to 'NN'
 #' @param condition_labels (optional) A list of condition-label pairs. The keys are the conditions in the edat file. The values are the strings that get used to create the timingfile filenames.
 #' @param figure (optional) A full path+filename to save a timing file figure. Defaults to NULL (i.e., do not make a figure)
-#' @param noreturn (optional) if TRUE, the function will return NULL instead of the timing data frame
+#' @param noreturn (optional) if TRUE (default), the function will return NULL instead of the timing data frame. To return the timing data, set to FALSE.
 #' #'
 #' @export
 edatTimingFiles <- function(datfile, datpath, savedir,
@@ -35,7 +35,7 @@ edatTimingFiles <- function(datfile, datpath, savedir,
                             noreturn = TRUE
                             ){
   if(timingfile_format == 'default'){
-    timingfile_format <- "sprintf('%s%s_%.2d_%s.txt', prefix, pid, session, condition)"
+    timingfile_format <- "sprintf('%s%s_%s_%s.txt', prefix, pid, session, condition)"
   }
   if(condition_labels == 'default'){
     condition_labels <- list(

@@ -14,7 +14,9 @@ edatTimingFiles(
   sheetname = NA,
   prefix = "NN",
   timingfile_format = "default",
-  condition_labels = "default"
+  condition_labels = "default",
+  figure = NULL,
+  noreturn = TRUE
 )
 }
 \arguments{
@@ -35,14 +37,18 @@ edatTimingFiles(
 \item{prefix}{(optional) a parameter that can be used in 'timingfile_format'. Defaults to 'NN'}
 
 \item{timingfile_format}{(optional) A string containing R code to evaluate to create the filenames of the timing files. Default is:
-"sprintf('\%s\%s_\%.2d_\%s.txt', prefix, pid, session, condition)"}
+"sprintf('\%s\%s_\%s_\%s.txt', prefix, pid, session, condition)"}
 
-\item{condition_labels}{(optional) A list of condition-label pairs. The keys are the conditions in the edat file. The values are the strings that get used to create the timingfile filenames.
+\item{condition_labels}{(optional) A list of condition-label pairs. The keys are the conditions in the edat file. The values are the strings that get used to create the timingfile filenames.}
+
+\item{figure}{(optional) A full path+filename to save a timing file figure. Defaults to NULL (i.e., do not make a figure)}
+
+\item{noreturn}{(optional) if TRUE (default), the function will return NULL instead of the timing data frame. To return the timing data, set to FALSE.
 #'}
 }
 \description{
 Read an edat text file and create timing files based on condition names
-for use with afni preprocessing.
+for use with afni preprocessing. Returns a data frame of onset times for condition and run.
 }
 \details{
 Usage:
