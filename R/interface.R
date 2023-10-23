@@ -6,6 +6,7 @@
 #'
 #' Read an edat text file and create timing files based on condition names
 #' for use with afni preprocessing. Returns a data frame of onset times for condition and run.
+#' Input can either be a raw eprime text file (i.e., first line "*** Header Start ***"), or an exported eprime text file (i.e., a tab delimited table -- a processed version of the raw eprime text file).
 #'
 #' Usage:
 #' edatTimingFiles('MID_NN-RCT-2002_T1.txt','data','output', 1001, 1)
@@ -15,8 +16,7 @@
 #' @param savedir path to the folder where timing files will be saved
 #' @param pid Participant ID
 #' @param session Scan Session ID
-#' @param skiprows (optional) number of rows to skip when importing the edatfile. Default is '1', meaning that column names start on row 2.
-#' @param sheetname (optional) If datfile is an excel sheet instead of a text file, the name of the Sheet to import
+#' @param skiprows (optional) number of rows to skip when importing the edatfile. Default is 'auto': If the first line contains '.edat3' it will skip that line and start on 2, otherwise it will start on the first line. #' @param sheetname (optional) If datfile is an excel sheet instead of a text file, the name of the Sheet to import
 #' @param timingfile_format (optional) A string containing R code to evaluate to create the filenames of the timing files. Default is:
 #'      "sprintf('%s%s_%s_%s.txt', prefix, pid, session, condition)"
 #' @param prefix (optional) a parameter that can be used in 'timingfile_format'. Defaults to 'NN'
@@ -27,7 +27,7 @@
 #' @export
 edatTimingFiles <- function(datfile, datpath, savedir,
                             pid, session,
-                            skiprows = 1, sheetname = NA,
+                            skiprows = 'auto', sheetname = NA,
                             prefix = 'NN',
                             timingfile_format = 'default',
                             condition_labels = 'default',
@@ -48,7 +48,7 @@ edatTimingFiles <- function(datfile, datpath, savedir,
       LossPos = 'PunPos',
       RewardPos = 'RewPos'
     )
-  }
+  }3
 
   dat <- loadDat(datfile, datpath, sheetname = sheetname, skiprows = skiprows)
 
@@ -56,5 +56,14 @@ edatTimingFiles <- function(datfile, datpath, savedir,
   if(noreturn){times <- NULL}
   return(times)
 }
+
+#rawpath <- '~/R-Drive/Stancil_S/CMH00002228_NN-RCT/MR_Data/Edats/2_MID'
+#rawfile <- 'MID_Behavioral_20161218_LM_Trigger_v1-2002-1.txt'
+#savedir <- '~/R-Drive/Bartolotti_J'
+
+## write file if name provided
+#if(!is.null(savefile) && !is.null(savepath)){
+#  write.table(df, file.path(savepath, savefile), sep = '\t', row.names = FALSE, col.names = TRUE)
+#}
 
 
