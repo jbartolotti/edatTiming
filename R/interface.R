@@ -48,7 +48,7 @@ edatTimingFiles <- function(datfile, datpath, savedir,
       LossPos = 'PunPos',
       RewardPos = 'RewPos'
     )
-  }3
+  }
 
   dat <- loadDat(datfile, datpath, sheetname = sheetname, skiprows = skiprows)
 
