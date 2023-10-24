@@ -1,6 +1,6 @@
 Package: edatTiming
 Title: Creates AFNI timing files from an edat file
-Version: 0.0.4.0
+Version: 0.0.5.0
 Authors@R: 
     person("James","Bartolotti", , "jbartolotti2@kumc.edu", role = c("aut", "cre"))
 Description: Makes AFNI timing files
@@ -10,5 +10,5 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports:
-  readxl
+  readxl,
   ggplot2
