@@ -1,9 +1,9 @@
 Package: edatTiming
 Title: Creates AFNI timing files from an edat file
-Version: 0.0.6.0
+Version: 0.0.7.0
 Authors@R: 
     person("James","Bartolotti", , "jbartolotti2@kumc.edu", role = c("aut", "cre"))
-Description: Makes AFNI timing files
+Description: Makes AFNI and fMRIprep timing files
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

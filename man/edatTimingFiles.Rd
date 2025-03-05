@@ -10,13 +10,15 @@ edatTimingFiles(
   savedir,
   pid,
   session,
-  skiprows = 1,
+  skiprows = "auto",
   sheetname = NA,
   prefix = "NN",
   timingfile_format = "default",
   condition_labels = "default",
   figure = NULL,
-  noreturn = TRUE
+  noreturn = TRUE,
+  proc_method = "MID",
+  export_format = "afni"
 )
 }
 \arguments{
@@ -30,7 +32,7 @@ edatTimingFiles(
 
 \item{session}{Scan Session ID}
 
-\item{skiprows}{(optional) number of rows to skip when importing the edatfile. Default is '1', meaning that column names start on row 2.}
+\item{skiprows}{(optional) number of rows to skip when importing the edatfile. Default is 'auto': If the first line contains '.edat3' it will skip that line and start on 2, otherwise it will start on the first line.}
 
 \item{sheetname}{(optional) If datfile is an excel sheet instead of a text file, the name of the Sheet to import}
 
@@ -43,14 +45,21 @@ edatTimingFiles(
 
 \item{figure}{(optional) A full path+filename to save a timing file figure. Defaults to NULL (i.e., do not make a figure)}
 
-\item{noreturn}{(optional) if TRUE (default), the function will return NULL instead of the timing data frame. To return the timing data, set to FALSE.
-#'}
+\item{noreturn}{(optional) if TRUE (default), the function will return NULL instead of the timing data frame. To return the timing data, set to FALSE.}
+
+\item{proc_method}{(optional) Determines which internal function is used to detect block/trial onsets and conditions. Defaults to 'MID', monetary incentive delay. Also supports 'nback'.}
+
+\item{export_format}{(optional) Defaults to 'AFNI', and creates a separate timing file for each condition containing event onsets. Also supports 'fmriprep' which outputs a BIDS-compliant events.tsv file.}
 }
 \description{
 Read an edat text file and create timing files based on condition names
 for use with afni preprocessing. Returns a data frame of onset times for condition and run.
+Input can either be a raw eprime text file (i.e., first line "*** Header Start ***"), or an exported eprime text file (i.e., a tab delimited table -- a processed version of the raw eprime text file).
 }
 \details{
-Usage:
+Example function calls:
+
 edatTimingFiles('MID_NN-RCT-2002_T1.txt','data','output', 1001, 1)
+
+edatTimingFiles('NBACK.txt','data','output','001','BL', timingfile_format = "sprintf('sub-\%s_ses-\%s_task-NBack_events.tsv', pid, session)", proc_method = 'nback', export_format = 'fmriprep')
 }
