@@ -98,13 +98,29 @@ procDat <- function(dat, proc_method){
     dat <- dat[trialrows,]
     dat$Run <- dat$RunList.Cycle
   } else if(proc_method == 'nback'){
-    exp_start_time <- unique(dat$Goodluck.OffsetTime)[1]
-    block_start_rows <- which(dat$Trial == 1)
-    conditions <- dat[block_start_rows,'Procedure.Block.']
+    exp_start_time <- as.numeric(unique(na.omit(dat$Goodluck.OffsetTime))[1])
+
+    if(any('Trial' %in% colnames(dat))){
+      trials <- dat$Trial
+    } else {
+      trial_onestim <- dat$singletriallist
+      trial_twostim <- dat$TrialList
+      trials <- ifelse(is.na(trial_onestim), trial_twostim, trial_onestim)
+    }
+    block_start_rows <- which(trials == 1)
+
+    if(!any('Procedure.Block.' %in% colnames(dat)))
+    {
+      dat[,'Procedure.Block.'] <- NA
+      dat[!is.na(dat$Procedure) & dat$Procedure == 'singletrial1','Procedure.Block.'] <- 'OneBackSeq'
+      dat[!is.na(dat$Procedure) & dat$Procedure == 'trial1','Procedure.Block.'] <- 'TwoBackSeq'
+    }
+      conditions <- dat[block_start_rows,'Procedure.Block.']
+
     # Get the onsets for trial 1 in each condition, then merge them
     time_onestim <- dat[block_start_rows,'onestim.OnsetTime']
     time_twostim <- dat[block_start_rows,'twostim.OnsetTime']
-    times <- ifelse(is.na(time_onestim), time_twostim, time_onestim)
+    times <- as.numeric(ifelse(is.na(time_onestim), time_twostim, time_onestim))
     onsets <- times - exp_start_time
 
     dd <- data.frame(onset = onsets/1000, duration = 64, trial_type = conditions, block = 1:length(block_start_rows))

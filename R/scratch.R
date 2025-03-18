@@ -29,5 +29,19 @@ export_format <- 'fmriprep'
 
 edatTimingFiles(datfile,datpath, mysave, pid, session, prefix = prefix, timingfile_format = timingfile_format, proc_method = proc_method, export_format = export_format)
 
+basedir <- '~/R-Drive/Hoglund/Vidoni_E/146904/COMET_MATLAB_Scripts/fMRI_Scripts'
+
+edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
+                file.path(basedir,'Edats/69-1-Nback'),
+                file.path('~','Timing'),
+                69,
+                1,
+                prefix = '',
+                timingfile_format = "sprintf('sub-%s_ses-%s_task-NBack_events.tsv', pid, session)",
+                proc_method = 'nback',
+                export_format = 'fmriprep')
+
 
 }
+
+
