@@ -204,6 +204,7 @@ writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condi
         fid <- file(file.path(savedir, fname ),'w')
         writeLines(paste(thiscond$onset, collapse = ' '),fid)
         close(fid)
+        out <- dat
       }
     } else if(proc_method == 'mid'){
       times <- list()
