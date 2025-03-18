@@ -62,7 +62,7 @@ edatTimingFiles <- function(datfile, datpath, savedir,
   loaded_dat <- loadDat(datfile, datpath, sheetname = sheetname, skiprows = skiprows)
   dat <- procDat(loaded_dat, proc_method)
 
-  times <- writeTimingfiles(dat, prefix, pid, session, timingfile_format, condition_labels, savedir, figure, export_format)
+  times <- writeTimingfiles(dat, prefix, pid, session, timingfile_format, condition_labels, savedir, figure, proc_method, export_format)
   if(noreturn){times <- NULL}
   return(times)
 }

@@ -33,13 +33,43 @@ basedir <- '~/R-Drive/Hoglund/Vidoni_E/146904/COMET_MATLAB_Scripts/fMRI_Scripts'
 
 edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
                 file.path(basedir,'Edats/69-1-Nback'),
-                file.path('~','Timing'),
+                file.path(basedir,'Timing'),
                 69,
                 1,
                 prefix = '',
                 timingfile_format = "sprintf('sub-%s_ses-%s_task-NBack_events.tsv', pid, session)",
                 proc_method = 'nback',
                 export_format = 'fmriprep')
+
+basedir <- '~/R-Drive/Hoglund/Vidoni_E/146904/COMET_MATLAB_Scripts/fMRI_Scripts'
+
+edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
+                file.path(basedir,'Edats/69-1-Nback'),
+                file.path(basedir,'Timing'),
+                69,
+                1,
+                prefix = '',
+                timingfile_format = "sprintf('%s_%s_NBack_%s.txt', pid, session, condition)",
+                proc_method = 'nback',
+                export_format = 'afni')
+
+
+
+#dat <- data.frame(onset = c(7,98,189,280), duration = c(64,64,64,64), trial_type = c('one','two','one','two'), block = c(1,2,3,4))
+
+
+basedir <- '~/R-Drive/Vidoni_E/146904/COMET_MATLAB_Scripts/fMRI_Scripts'
+
+edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
+                file.path(basedir,'Edats/69-1-Nback'),
+                file.path('~','Timing'),
+                69,
+                1,
+                prefix = '',
+                timingfile_format = "sprintf('%s_%s_NBack_%s.txt', pid, session, condition)",
+                proc_method = 'nback',
+                export_format = 'afni')
+
 
 
 }

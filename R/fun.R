@@ -186,7 +186,7 @@ edatTxt2mat <- function(mylines) { #rawfile, rawpath) {
   return(df)
 }
 
-writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condition_labels, savedir, figurename, format = 'afni'){
+writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condition_labels, savedir, figurename, proc_method, format){
   format <- tolower(format)
   if(format == 'fmriprep'){
     fname <- eval(parse(text = timingfile_format))
@@ -195,64 +195,75 @@ writeTimingfiles <- function(dat, prefix, pid, session, timingfile_format, condi
 
   } else if(format == 'afni'){
 
-
-    times <- list()
-
-    antcond <- unique(dat$CondAnt)
-    antcond <- antcond[!is.na(antcond)]
-    antcond <- antcond[!(antcond %in% 'none')]
-
-    for(cc in antcond){
-      runtimes <- list()
-      condition <- condition_labels[[cc]]
-      fname <- eval(parse(text = timingfile_format))
-      fid <- file(file.path(savedir, fname ),'w+')
-      myruns <- unique(dat$Run[dat$CondAnt == cc])
-      myruns <- myruns[!is.na(myruns)]
-      for(rr in myruns){
-        tt <- dat$CueStart.sec[dat$CondAnt == cc & dat$Run == rr]
-        writeLines(paste(tt, collapse = ' '),fid)
-        runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
-
+    proc_method <- tolower(proc_method)
+    if(proc_method == 'nback'){
+      for(cc in unique(dat$trial_type)){
+        thiscond <- subset(dat, trial_type == cc)
+        condition <- cc
+        fname <- eval(parse(text = timingfile_format))
+        fid <- file(file.path(savedir, fname ),'w')
+        writeLines(paste(thiscond$onset, collapse = ' '),fid)
+        close(fid)
       }
-      times[[cc]] <- do.call('rbind',runtimes)
-      close(fid)
-    }
+    } else if(proc_method == 'mid'){
+      times <- list()
 
-    fdbcond <- unique(dat$CondFeedback)
-    fdbcond <- fdbcond[!is.na(fdbcond)]
-    fdbcond <- fdbcond[!(fdbcond %in% 'none')]
-    for(cc in fdbcond){
-      runtimes <- list()
-      condition <- condition_labels[[cc]]
-      fname <- eval(parse(text = timingfile_format))
-      fid <- file(file.path(savedir, fname ),'w+')
-      myruns <- unique(dat$Run[dat$CondFeedback == cc])
-      myruns[!is.na(myruns)]
-      for(rr in myruns){
-        tt <- dat$FdbkStart.sec[dat$CondFeedback == cc & dat$Run == rr]
-        writeLines(paste(tt, collapse = ' '),fid)
-        runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
+      antcond <- unique(dat$CondAnt)
+      antcond <- antcond[!is.na(antcond)]
+      antcond <- antcond[!(antcond %in% 'none')]
 
+      for(cc in antcond){
+        runtimes <- list()
+        condition <- condition_labels[[cc]]
+        fname <- eval(parse(text = timingfile_format))
+        fid <- file(file.path(savedir, fname ),'w+')
+        myruns <- unique(dat$Run[dat$CondAnt == cc])
+        myruns <- myruns[!is.na(myruns)]
+        for(rr in myruns){
+          tt <- dat$CueStart.sec[dat$CondAnt == cc & dat$Run == rr]
+          writeLines(paste(tt, collapse = ' '),fid)
+          runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
+
+        }
+        times[[cc]] <- do.call('rbind',runtimes)
+        close(fid)
       }
-      times[[cc]] <- do.call('rbind',runtimes)
-      close(fid)
+
+      fdbcond <- unique(dat$CondFeedback)
+      fdbcond <- fdbcond[!is.na(fdbcond)]
+      fdbcond <- fdbcond[!(fdbcond %in% 'none')]
+      for(cc in fdbcond){
+        runtimes <- list()
+        condition <- condition_labels[[cc]]
+        fname <- eval(parse(text = timingfile_format))
+        fid <- file(file.path(savedir, fname ),'w+')
+        myruns <- unique(dat$Run[dat$CondFeedback == cc])
+        myruns[!is.na(myruns)]
+        for(rr in myruns){
+          tt <- dat$FdbkStart.sec[dat$CondFeedback == cc & dat$Run == rr]
+          writeLines(paste(tt, collapse = ' '),fid)
+          runtimes[[rr]] <- data.frame(cond = cc, run = rr, time = tt, stringsAsFactors = FALSE)
+
+        }
+        times[[cc]] <- do.call('rbind',runtimes)
+        close(fid)
+      }
+      alltimes <- do.call('rbind',times)
+      if(!is.null(figurename)){
+        hlinedat <- data.frame(
+          time = rep(c(min(alltimes$time),max(alltimes$time)),by = length(unique(alltimes$cond)) * length(unique(alltimes$run))),
+          cond = rep(unique(alltimes$cond), each = 2, 2),
+          run = rep(unique(alltimes$run), each = 2*length(unique(alltimes$cond))))
+        ggplot2::ggplot(alltimes, ggplot2::aes(x = time, y = cond)) +
+          ggplot2::theme_bw()  +
+          ggplot2::geom_line(data = hlinedat, ggplot2::aes(color = cond), alpha = .1) +
+          ggplot2::geom_line(ggplot2::aes(group = 1)) +
+          ggplot2::geom_point(ggplot2::aes(color = cond)) +
+          ggplot2::facet_wrap(. ~ run, ncol = 1) + labs(x = '', y = '')
+        ggplot2::ggsave(figurename, height = 3, width = 12)
+      }
+      out <- alltimes
     }
-    alltimes <- do.call('rbind',times)
-    if(!is.null(figurename)){
-      hlinedat <- data.frame(
-        time = rep(c(min(alltimes$time),max(alltimes$time)),by = length(unique(alltimes$cond)) * length(unique(alltimes$run))),
-        cond = rep(unique(alltimes$cond), each = 2, 2),
-        run = rep(unique(alltimes$run), each = 2*length(unique(alltimes$cond))))
-      ggplot2::ggplot(alltimes, ggplot2::aes(x = time, y = cond)) +
-        ggplot2::theme_bw()  +
-        ggplot2::geom_line(data = hlinedat, ggplot2::aes(color = cond), alpha = .1) +
-        ggplot2::geom_line(ggplot2::aes(group = 1)) +
-        ggplot2::geom_point(ggplot2::aes(color = cond)) +
-        ggplot2::facet_wrap(. ~ run, ncol = 1) + labs(x = '', y = '')
-      ggplot2::ggsave(figurename, height = 3, width = 12)
-    }
-    out <- alltimes
   }
   return(out)
 
