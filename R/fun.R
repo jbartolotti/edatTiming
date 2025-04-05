@@ -51,10 +51,19 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 'auto'){
       }
     }
   }
-  return(dat)
+  out <- list(dat = dat, config = list(procedure_trial_col = procedure_trial_col, procedure_trial_value = procedure_trial_val))
+  return(out)
 }
 
-procDat <- function(dat, proc_method){
+procDat <- function(dat, proc_method, config = NULL){
+  if(is.null(config)){
+    procedure_trial_col <- 'Procedure.Trial.'
+    procedure_trial_value <- 'RunProc'
+  } else{
+    procedure_trial_col <- config$procedure_trial_col
+    procedure_trial_value <- config$procedure_trial_val
+  }
+
   proc_method <- tolower(proc_method)
   if(proc_method == 'mid'){
 
