@@ -21,7 +21,7 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 'auto'){
 
     myencoding <- 'default'
     # Check if the first line is \xff\xfe*
-    if (mylines[1] == "\xff\xfe*" || mylines[1] == 'ÿþC') {
+    if (mylines[1] == "\xff\xfe*" || grepl('ÿ',mylines[1])) {
       # Re-import the file with encoding = "UTF-16LE"
       myencoding <- "UTF-16LE"
       fcon <- file(file.path(datpath,datfile), encoding = myencoding)
@@ -51,7 +51,7 @@ loadDat <- function(datfile, datpath, sheetname = NA, skiprows = 'auto'){
       }
     }
   }
-  out <- list(dat = dat, config = list(procedure_trial_col = procedure_trial_col, procedure_trial_value = procedure_trial_val))
+  out <- list(dat = dat, config = list(procedure_trial_col = procedure_trial_col, procedure_trial_value = procedure_trial_value))
   return(out)
 }
 
@@ -61,7 +61,7 @@ procDat <- function(dat, proc_method, config = NULL){
     procedure_trial_value <- 'RunProc'
   } else{
     procedure_trial_col <- config$procedure_trial_col
-    procedure_trial_value <- config$procedure_trial_val
+    procedure_trial_value <- config$procedure_trial_value
   }
 
   proc_method <- tolower(proc_method)
