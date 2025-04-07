@@ -75,3 +75,88 @@ edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
 }
 
 
+
+
+
+##############
+
+file8 <- 'test_utf8.txt'
+file16 <- 'test_utf16le.txt'
+
+fcon <- file(file8, encoding = 'UTF-8')
+read8_8 <- readLines(fcon, encoding = "UTF-8")
+close(fcon)
+
+fcon <- file(file8, encoding = 'UTF-16LE')
+read8_16 <- readLines(fcon, encoding = "UTF-16LE")
+close(fcon)
+
+fcon <- file(file8)
+read8_def <- readLines(fcon)
+close(fcon)
+
+fcon <- file(file16, encoding = 'UTF-8')
+read16_8 <- readLines(fcon, encoding = "UTF-8")
+close(fcon)
+
+fcon <- file(file16, encoding = 'UTF-16LE')
+read16_16 <- readLines(fcon, encoding = "UTF-16LE")
+close(fcon)
+
+fcon <- file(file16)
+read16_def <- readLines(fcon)
+close(fcon)
+
+stringi::stri_enc_detect(read8_8[[1]])
+stringi::stri_enc_detect(read8_16[[1]])
+stringi::stri_enc_detect(read16_8[[1]])
+stringi::stri_enc_detect(read16_16[[1]])
+
+nnr <- file.path(datpath,datfile)
+fcon <- file(nnr,  encoding = "UTF-8")
+readnnr_8 <- readLines(fcon, encoding = "UTF-8")
+close(fcon)
+
+fcon <- file(nnr)
+readnnr_def <- readLines(fcon)
+close(fcon)
+
+
+fcon <- file(nnr,  encoding = "UTF-16LE")
+readnnr_16 <- readLines(fcon, encoding = "UTF-16LE")
+close(fcon)
+
+a <- stri_enc_detect(read16_def[1])[[1]]
+b <- stri_enc_detect(read8_def[1])[[1]]
+
+which(a$Encoding == "UTF-16LE")
+which(a$Encoding == "UTF-8")
+
+which(b$Encoding == "UTF-16LE")
+which(b$Encoding == "UTF-8")
+
+
+encodingType <- function(filename, use_default_utf8 = TRUE){
+  fcon <- file(filename)
+  read_default <- try(readLines(fcon))
+  close(fcon)
+  enc <- stringi::stri_enc_detect(read_default[1])[[1]]
+  rank8 <- which(enc$Encoding == "UTF-8")
+  rank16 <- which(enc$Encoding == "UTF-16LE")
+  if(length(rank8) == 0){rank8 <- Inf}
+  if(length(rank16) == 0){rank16 <- Inf}
+
+  if(rank16 < rank8){
+    this_encoding <- 'UTF-16LE'
+  } else{
+    if(use_default_utf8){
+      this_encoding <- 'default'
+    } else{
+      this_encoding <- 'UTF-8'
+    }
+  }
+  return(this_encoding)
+}
+
+
+
