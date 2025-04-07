@@ -72,7 +72,7 @@ edatTimingFiles('Nback_MRI_IGNITE-69-1.txt',
 
 
 
-}
+
 
 
 
@@ -136,27 +136,6 @@ which(b$Encoding == "UTF-16LE")
 which(b$Encoding == "UTF-8")
 
 
-encodingType <- function(filename, use_default_utf8 = TRUE){
-  fcon <- file(filename)
-  read_default <- try(readLines(fcon))
-  close(fcon)
-  enc <- stringi::stri_enc_detect(read_default[1])[[1]]
-  rank8 <- which(enc$Encoding == "UTF-8")
-  rank16 <- which(enc$Encoding == "UTF-16LE")
-  if(length(rank8) == 0){rank8 <- Inf}
-  if(length(rank16) == 0){rank16 <- Inf}
-
-  if(rank16 < rank8){
-    this_encoding <- 'UTF-16LE'
-  } else{
-    if(use_default_utf8){
-      this_encoding <- 'default'
-    } else{
-      this_encoding <- 'UTF-8'
-    }
-  }
-  return(this_encoding)
 }
-
 
 
